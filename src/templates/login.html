@@ -1,0 +1,402 @@
+{% extends "base.html" %} {% block title %}Login - Todos App{% endblock %} {%
+block meta_description %}Sign in to your Todos account{% endblock %} {% block
+extra_css %}
+<style>
+  .login-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    position: relative;
+  }
+
+  .login-container::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(
+        circle at 20% 50%,
+        rgba(255, 255, 255, 0.1) 0%,
+        transparent 50%
+      ),
+      radial-gradient(
+        circle at 80% 80%,
+        rgba(255, 255, 255, 0.05) 0%,
+        transparent 50%
+      );
+    pointer-events: none;
+  }
+
+  .login-card {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: var(--border-radius);
+    box-shadow: var(--card-shadow);
+    width: 100%;
+    max-width: 420px;
+    padding: 2.5rem;
+    position: relative;
+    z-index: 1;
+    animation: slideInUp 0.6s ease-out;
+  }
+
+  @keyframes slideInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .login-header {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+
+  .login-header .logo {
+    font-size: 2.5rem;
+    color: var(--primary-color);
+    margin-bottom: 0.5rem;
+  }
+
+  .login-header h1 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #2d3748;
+    margin-bottom: 0.5rem;
+  }
+
+  .login-header p {
+    color: #718096;
+    font-size: 0.95rem;
+  }
+
+  .form-control {
+    border: 2px solid #e2e8f0;
+    border-radius: var(--border-radius);
+    padding: 0.875rem 1rem;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    background: #f7fafc;
+  }
+
+  .form-control:focus {
+    border-color: var(--primary-color);
+    background: white;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  }
+
+  .form-label {
+    font-weight: 600;
+    color: #2d3748;
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+  }
+
+  .form-group {
+    margin-bottom: 1.5rem;
+  }
+
+  .btn-login {
+    background: linear-gradient(
+      135deg,
+      var(--primary-color),
+      var(--secondary-color)
+    );
+    border: none;
+    border-radius: var(--border-radius);
+    padding: 0.875rem 1.5rem;
+    font-weight: 600;
+    font-size: 1rem;
+    color: white;
+    width: 100%;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+  }
+
+  .btn-login:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+    color: white;
+  }
+
+  .btn-login:active {
+    transform: translateY(0);
+  }
+
+  .btn-login:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .divider {
+    display: flex;
+    align-items: center;
+    margin: 2rem 0;
+  }
+
+  .divider::before,
+  .divider::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: #e2e8f0;
+  }
+
+  .divider span {
+    padding: 0 1rem;
+    color: #a0aec0;
+    font-size: 0.85rem;
+  }
+
+  .login-links {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    font-size: 0.9rem;
+  }
+
+  .login-links a {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease;
+  }
+
+  .login-links a:hover {
+    color: var(--secondary-color);
+  }
+
+  .auth-link {
+    text-align: center;
+    margin-top: 1.5rem;
+    color: #718096;
+    font-size: 0.95rem;
+  }
+
+  .auth-link a {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 600;
+  }
+
+  .auth-link a:hover {
+    text-decoration: underline;
+  }
+
+  .loading-spinner {
+    display: none;
+  }
+
+  .btn-login.loading {
+    position: relative;
+    color: transparent;
+  }
+
+  .btn-login.loading::after {
+    content: "";
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    top: 50%;
+    left: 50%;
+    margin-left: -8px;
+    margin-top: -8px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: spin 0.6s linear infinite;
+  }
+
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  .alert {
+    border-radius: var(--border-radius);
+    border: none;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    animation: slideInDown 0.3s ease-out;
+  }
+
+  @keyframes slideInDown {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .alert-danger {
+    background: #fef2f2;
+    border-left: 4px solid var(--danger-color);
+    color: #742a2a;
+  }
+
+  .remember-me {
+    display: flex;
+    align-items: center;
+    font-size: 0.9rem;
+    color: #4a5568;
+  }
+
+  .form-check-input {
+    border-color: #cbd5e0;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .form-check-input:checked {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+  }
+
+  .form-check-input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.25rem rgba(102, 126, 234, 0.25);
+  }
+</style>
+{% endblock %} {% block content %}
+<div class="login-container">
+  <div class="login-card">
+    <div class="login-header">
+      <div class="logo">
+        <i class="bi bi-check2-square"></i>
+      </div>
+      <h1>Welcome Back</h1>
+      <p>Sign in to your Todos account</p>
+    </div>
+
+    <div id="errorAlert"></div>
+
+    <form id="loginForm">
+      <div class="form-group">
+        <label for="username" class="form-label">
+          <i class="bi bi-person"></i> Username or Email
+        </label>
+        <input
+          type="text"
+          class="form-control"
+          id="username"
+          name="username"
+          placeholder="Enter your username or email"
+          required
+          autocomplete="username"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="password" class="form-label">
+          <i class="bi bi-lock"></i> Password
+        </label>
+        <input
+          type="password"
+          class="form-control"
+          id="password"
+          name="password"
+          placeholder="Enter your password"
+          required
+          autocomplete="current-password"
+        />
+      </div>
+
+      <div class="login-links">
+        <div class="form-check remember-me">
+          <input
+            class="form-check-input"
+            type="checkbox"
+            id="rememberMe"
+            name="rememberMe"
+          />
+          <label class="form-check-label" for="rememberMe"> Remember me </label>
+        </div>
+        <a href="/forgot-password">Forgot password?</a>
+      </div>
+
+      <button type="submit" class="btn btn-login" id="loginBtn">
+        <i class="bi bi-box-arrow-in-right"></i> Sign In
+      </button>
+    </form>
+
+    <div class="auth-link">
+      Don't have an account? <a href="/register">Sign up here</a>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block extra_js %}
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const loginForm = document.getElementById("loginForm");
+    const loginBtn = document.getElementById("loginBtn");
+    const errorAlert = document.getElementById("errorAlert");
+
+    loginForm.addEventListener("submit", async function (e) {
+      e.preventDefault();
+
+      const username = document.getElementById("username").value;
+      const password = document.getElementById("password").value;
+
+      loginBtn.disabled = true;
+      loginBtn.classList.add("loading");
+
+      // Clear error alert
+      while (errorAlert.firstChild) {
+        errorAlert.removeChild(errorAlert.firstChild);
+      }
+
+      try {
+        const result = await auth.login(username, password);
+        if (result.success) {
+          showToast("Login successful!", "success");
+          // Cookie is set by server, no need to store token
+          // Redirect after a short delay to ensure cookie is processed
+          await sleep(500);
+          window.location.href = "/todos";
+        }
+      } catch (error) {
+        // Create error alert element safely
+        const alertDiv = document.createElement("div");
+        alertDiv.className = "alert alert-danger";
+        alertDiv.setAttribute("role", "alert");
+
+        const icon = document.createElement("i");
+        icon.className = "bi bi-exclamation-circle";
+
+        const strong = document.createElement("strong");
+        strong.textContent = "Login Failed:";
+
+        const message = document.createTextNode(
+          " " + (error.message || "Invalid credentials")
+        );
+
+        alertDiv.appendChild(icon);
+        alertDiv.appendChild(document.createTextNode(" "));
+        alertDiv.appendChild(strong);
+        alertDiv.appendChild(message);
+
+        errorAlert.appendChild(alertDiv);
+
+        loginBtn.disabled = false;
+        loginBtn.classList.remove("loading");
+      }
+    });
+  });
+</script>
+{% endblock %}

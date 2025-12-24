@@ -1,0 +1,147 @@
+{% extends "base.html" %} {% block title %}Index - Todos App{% endblock %} {%
+block meta_description %}Welcome to Todos App{% endblock %} {% block extra_css
+%}
+<style>
+  .landing-container {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    position: relative;
+    padding: 2rem;
+  }
+
+  .landing-container::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(
+        circle at 20% 50%,
+        rgba(255, 255, 255, 0.1) 0%,
+        transparent 50%
+      ),
+      radial-gradient(
+        circle at 80% 80%,
+        rgba(255, 255, 255, 0.05) 0%,
+        transparent 50%
+      );
+    pointer-events: none;
+  }
+
+  .landing-content {
+    text-align: center;
+    color: white;
+    position: relative;
+    z-index: 1;
+    animation: slideInUp 0.8s ease-out;
+  }
+
+  .landing-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    animation: bounce 2s ease-in-out infinite;
+  }
+
+  @keyframes bounce {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-20px);
+    }
+  }
+
+  .landing-title {
+    font-size: 3rem;
+    font-weight: 800;
+    margin-bottom: 1rem;
+    letter-spacing: -1px;
+  }
+
+  .landing-description {
+    font-size: 1.25rem;
+    margin-bottom: 2rem;
+    opacity: 0.9;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .landing-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .btn-landing {
+    padding: 1rem 2rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border: none;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  }
+
+  .btn-primary-landing {
+    background: white;
+    color: var(--primary-color);
+  }
+
+  .btn-primary-landing:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.3);
+  }
+
+  .btn-secondary-landing {
+    background: transparent;
+    color: white;
+    border: 2px solid white;
+  }
+
+  .btn-secondary-landing:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-3px);
+  }
+
+  @keyframes slideInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+</style>
+{% endblock %} {% block content %}
+<div class="landing-container">
+  <div class="landing-content">
+    <div class="landing-icon">
+      <i class="bi bi-check2-square"></i>
+    </div>
+    <h1 class="landing-title">Todos</h1>
+    <p class="landing-description">
+      Organize your tasks, manage your time, and boost your productivity with
+      our modern todo application.
+    </p>
+    <div class="landing-buttons">
+      <a href="/login" class="btn-landing btn-primary-landing">
+        <i class="bi bi-box-arrow-in-right"></i> Sign In
+      </a>
+      <a href="/register" class="btn-landing btn-secondary-landing">
+        <i class="bi bi-person-plus"></i> Create Account
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}

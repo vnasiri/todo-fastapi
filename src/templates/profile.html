@@ -1,0 +1,666 @@
+{% extends "base.html" %} {% block title %}Profile - Todos App{% endblock %} {%
+block meta_description %}Manage your profile and settings{% endblock %} {% block
+extra_css %}
+<style>
+  .profile-page {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: calc(100vh - 200px);
+    padding: 2rem 0;
+  }
+
+  .profile-header {
+    color: white;
+    margin-bottom: 3rem;
+    animation: slideInDown 0.6s ease-out;
+  }
+
+  .profile-header h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+  }
+
+  .profile-header p {
+    font-size: 1.1rem;
+    opacity: 0.9;
+  }
+
+  .profile-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+  }
+
+  @media (max-width: 768px) {
+    .profile-container {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .profile-card {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: var(--border-radius);
+    box-shadow: var(--card-shadow);
+    padding: 2rem;
+    animation: slideInUp 0.6s ease-out;
+  }
+
+  .profile-card h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #2d3748;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .profile-card h2 i {
+    color: var(--primary-color);
+  }
+
+  .form-control {
+    border: 2px solid #e2e8f0;
+    border-radius: var(--border-radius);
+    padding: 0.875rem 1rem;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    background: #f7fafc;
+  }
+
+  .form-control:focus {
+    border-color: var(--primary-color);
+    background: white;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  }
+
+  .form-control:disabled {
+    background: #f7fafc;
+    color: #718096;
+  }
+
+  .form-label {
+    font-weight: 600;
+    color: #2d3748;
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+  }
+
+  .form-group {
+    margin-bottom: 1.25rem;
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+  }
+
+  @media (max-width: 768px) {
+    .form-row {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .btn-save {
+    background: linear-gradient(
+      135deg,
+      var(--primary-color),
+      var(--secondary-color)
+    );
+    border: none;
+    border-radius: var(--border-radius);
+    padding: 0.875rem 1.5rem;
+    font-weight: 600;
+    font-size: 1rem;
+    color: white;
+    width: 100%;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+  }
+
+  .btn-save:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+    color: white;
+  }
+
+  .btn-save:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  .info-display {
+    background: #f7fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: var(--border-radius);
+    padding: 1rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .info-label {
+    font-weight: 600;
+    color: #4a5568;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.5rem;
+  }
+
+  .info-value {
+    color: #2d3748;
+    font-size: 1rem;
+  }
+
+  .alert {
+    border-radius: var(--border-radius);
+    border: none;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    animation: slideInDown 0.3s ease-out;
+  }
+
+  @keyframes slideInDown {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .alert-danger {
+    background: #fef2f2;
+    border-left: 4px solid var(--danger-color);
+    color: #742a2a;
+  }
+
+  .alert-success {
+    background: #f0fdf4;
+    border-left: 4px solid var(--success-color);
+    color: #15803d;
+  }
+
+  .danger-zone {
+    background: #fef2f2;
+    border: 2px solid #fed7d7;
+    border-radius: var(--border-radius);
+    padding: 1.5rem;
+    margin-top: 2rem;
+  }
+
+  .danger-zone h3 {
+    color: var(--danger-color);
+    margin-bottom: 1rem;
+    font-weight: 700;
+  }
+
+  .danger-zone p {
+    color: #742a2a;
+    margin-bottom: 1rem;
+    font-size: 0.95rem;
+  }
+
+  .btn-danger {
+    background: var(--danger-color);
+    border: none;
+    border-radius: var(--border-radius);
+    padding: 0.75rem 1.25rem;
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .btn-danger:hover {
+    background: #e53e3e;
+    transform: translateY(-2px);
+  }
+
+  .password-strength {
+    margin-top: 0.5rem;
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+
+  .strength-weak {
+    background: rgba(245, 101, 101, 0.1);
+    color: var(--danger-color);
+  }
+
+  .strength-fair {
+    background: rgba(237, 137, 54, 0.1);
+    color: var(--warning-color);
+  }
+
+  .strength-good {
+    background: rgba(72, 187, 120, 0.1);
+    color: var(--success-color);
+  }
+
+  @keyframes slideInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+</style>
+{% endblock %} {% block content %}
+<div class="profile-page">
+  <div class="container py-4">
+    <!-- Header -->
+    <div class="profile-header">
+      <h1><i class="bi bi-person-circle"></i> My Profile</h1>
+      <p>Manage your account settings and preferences</p>
+    </div>
+
+    <div class="profile-container">
+      <!-- User Information -->
+      <div class="profile-card">
+        <h2><i class="bi bi-person"></i> Personal Information</h2>
+
+        <div id="profileError"></div>
+        <div id="profileSuccess"></div>
+
+        <form id="profileForm">
+          <div class="form-group">
+            <label for="username" class="form-label">
+              <i class="bi bi-person"></i> Username
+            </label>
+            <input
+              type="text"
+              class="form-control"
+              id="username"
+              name="username"
+              disabled
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="email" class="form-label">
+              <i class="bi bi-envelope"></i> Email
+            </label>
+            <input type="email" class="form-control" id="email" name="email" />
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="firstName" class="form-label">
+                <i class="bi bi-person-badge"></i> First Name
+              </label>
+              <input
+                type="text"
+                class="form-control"
+                id="firstName"
+                name="firstName"
+                placeholder="Your first name"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="lastName" class="form-label">
+                <i class="bi bi-person-badge"></i> Last Name
+              </label>
+              <input
+                type="text"
+                class="form-control"
+                id="lastName"
+                name="lastName"
+                placeholder="Your last name"
+              />
+            </div>
+          </div>
+
+          <div class="info-display">
+            <div class="info-label">Account Status</div>
+            <div class="info-value">
+              <span class="badge bg-success">Active</span>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-save" id="saveProfileBtn">
+            <i class="bi bi-check-circle"></i> Save Changes
+          </button>
+        </form>
+      </div>
+
+      <!-- Change Password -->
+      <div class="profile-card">
+        <h2><i class="bi bi-lock"></i> Security</h2>
+
+        <div id="passwordError"></div>
+        <div id="passwordSuccess"></div>
+
+        <form id="passwordForm">
+          <div class="form-group">
+            <label for="currentPassword" class="form-label">
+              <i class="bi bi-lock"></i> Current Password
+            </label>
+            <input
+              type="password"
+              class="form-control"
+              id="currentPassword"
+              name="currentPassword"
+              placeholder="Enter your current password"
+              required
+              autocomplete="current-password"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="newPassword" class="form-label">
+              <i class="bi bi-lock-fill"></i> New Password
+            </label>
+            <input
+              type="password"
+              class="form-control"
+              id="newPassword"
+              name="newPassword"
+              placeholder="Enter a strong password"
+              required
+              minlength="8"
+              autocomplete="new-password"
+            />
+            <div id="passwordStrength" class="password-strength"></div>
+          </div>
+
+          <div class="form-group">
+            <label for="confirmPassword" class="form-label">
+              <i class="bi bi-lock-check"></i> Confirm Password
+            </label>
+            <input
+              type="password"
+              class="form-control"
+              id="confirmPassword"
+              name="confirmPassword"
+              placeholder="Confirm your new password"
+              required
+              autocomplete="new-password"
+            />
+          </div>
+
+          <button type="submit" class="btn btn-save" id="savePasswordBtn">
+            <i class="bi bi-shield-check"></i> Update Password
+          </button>
+        </form>
+
+        <!-- Danger Zone -->
+        <div class="danger-zone">
+          <h3><i class="bi bi-exclamation-triangle"></i> Danger Zone</h3>
+          <p>
+            Once you delete your account, there is no going back. Please be
+            certain.
+          </p>
+          <button class="btn btn-danger" id="deleteAccountBtn">
+            <i class="bi bi-trash"></i> Delete Account
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block extra_js %}
+<script>
+  document.addEventListener("DOMContentLoaded", async function () {
+    // Load user profile
+    await loadUserProfile();
+
+    // Profile form
+    const profileForm = document.getElementById("profileForm");
+    const saveProfileBtn = document.getElementById("saveProfileBtn");
+    const profileError = document.getElementById("profileError");
+    const profileSuccess = document.getElementById("profileSuccess");
+
+    profileForm.addEventListener("submit", async function (e) {
+      e.preventDefault();
+
+      const firstName = document.getElementById("firstName").value;
+      const lastName = document.getElementById("lastName").value;
+      const email = document.getElementById("email").value;
+
+      saveProfileBtn.disabled = true;
+      saveProfileBtn.classList.add("loading");
+
+      // Clear alerts
+      while (profileError.firstChild) {
+        profileError.removeChild(profileError.firstChild);
+      }
+      while (profileSuccess.firstChild) {
+        profileSuccess.removeChild(profileSuccess.firstChild);
+      }
+
+      try {
+        // Call update profile API
+        const response = await fetch("/api/v1/users/me", {
+          method: "PUT",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email: email,
+            first_name: firstName,
+            last_name: lastName,
+          }),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.detail || "Failed to update profile");
+        }
+
+        showToast("Profile updated successfully!", "success");
+        const successAlert = document.createElement("div");
+        successAlert.className = "alert alert-success";
+        successAlert.setAttribute("role", "alert");
+
+        const icon = document.createElement("i");
+        icon.className = "bi bi-check-circle";
+
+        const message = document.createTextNode(
+          " Your profile has been updated successfully."
+        );
+
+        successAlert.appendChild(icon);
+        successAlert.appendChild(message);
+        profileSuccess.appendChild(successAlert);
+        saveProfileBtn.disabled = false;
+        saveProfileBtn.classList.remove("loading");
+      } catch (error) {
+        const errorAlert = document.createElement("div");
+        errorAlert.className = "alert alert-danger";
+        errorAlert.setAttribute("role", "alert");
+
+        const icon = document.createElement("i");
+        icon.className = "bi bi-exclamation-circle";
+
+        const message = document.createTextNode(
+          " " + (error.message || "Failed to update profile")
+        );
+
+        errorAlert.appendChild(icon);
+        errorAlert.appendChild(document.createTextNode(" "));
+        errorAlert.appendChild(message);
+        profileError.appendChild(errorAlert);
+        saveProfileBtn.disabled = false;
+        saveProfileBtn.classList.remove("loading");
+      }
+    });
+
+    // Password form
+    const passwordForm = document.getElementById("passwordForm");
+    const newPasswordInput = document.getElementById("newPassword");
+    const savePasswordBtn = document.getElementById("savePasswordBtn");
+    const passwordError = document.getElementById("passwordError");
+    const passwordSuccess = document.getElementById("passwordSuccess");
+
+    newPasswordInput.addEventListener("input", function () {
+      checkPasswordStrength(this.value);
+    });
+
+    function createAlert(message, type) {
+      const alertDiv = document.createElement("div");
+      alertDiv.className = `alert alert-${type}`;
+      alertDiv.setAttribute("role", "alert");
+
+      const icon = document.createElement("i");
+      icon.className =
+        type === "danger" ? "bi bi-exclamation-circle" : "bi bi-check-circle";
+
+      const messageText = document.createTextNode(" " + message);
+
+      alertDiv.appendChild(icon);
+      alertDiv.appendChild(document.createTextNode(" "));
+      alertDiv.appendChild(messageText);
+
+      return alertDiv;
+    }
+
+    passwordForm.addEventListener("submit", async function (e) {
+      e.preventDefault();
+
+      const currentPassword = document.getElementById("currentPassword").value;
+      const newPassword = document.getElementById("newPassword").value;
+      const confirmPassword = document.getElementById("confirmPassword").value;
+
+      if (newPassword !== confirmPassword) {
+        // Clear and add new error
+        while (passwordError.firstChild) {
+          passwordError.removeChild(passwordError.firstChild);
+        }
+        passwordError.appendChild(
+          createAlert("Passwords do not match", "danger")
+        );
+        return;
+      }
+
+      savePasswordBtn.disabled = true;
+      savePasswordBtn.classList.add("loading");
+
+      // Clear alerts
+      while (passwordError.firstChild) {
+        passwordError.removeChild(passwordError.firstChild);
+      }
+      while (passwordSuccess.firstChild) {
+        passwordSuccess.removeChild(passwordSuccess.firstChild);
+      }
+
+      try {
+        // Call change password API
+        const response = await fetch("/api/v1/users/change-password", {
+          method: "POST",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            current_password: currentPassword,
+            new_password: newPassword,
+            new_password_confirm: confirmPassword,
+          }),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.detail || "Failed to update password");
+        }
+
+        showToast("Password updated successfully!", "success");
+        passwordSuccess.appendChild(
+          createAlert("Your password has been updated successfully.", "success")
+        );
+        passwordForm.reset();
+        savePasswordBtn.disabled = false;
+        savePasswordBtn.classList.remove("loading");
+      } catch (error) {
+        passwordError.appendChild(
+          createAlert(error.message || "Failed to update password", "danger")
+        );
+        savePasswordBtn.disabled = false;
+        savePasswordBtn.classList.remove("loading");
+      }
+    });
+
+    // Delete account
+    document
+      .getElementById("deleteAccountBtn")
+      .addEventListener("click", function () {
+        if (
+          confirm(
+            "Are you sure you want to delete your account? This cannot be undone."
+          )
+        ) {
+          if (confirm('This is your last chance. Type "DELETE" to confirm.')) {
+            // Call delete account API
+            window.location.href = "/login";
+          }
+        }
+      });
+  });
+
+  async function loadUserProfile() {
+    try {
+      // Fetch user profile from API
+      const response = await fetch("/api/v1/users/me", {
+        method: "GET",
+        credentials: "include",
+      });
+
+      if (!response.ok) throw new Error("Failed to load profile");
+
+      const user = await response.json();
+
+      document.getElementById("username").value = user.username;
+      document.getElementById("email").value = user.email || "";
+      document.getElementById("firstName").value = user.first_name || "";
+      document.getElementById("lastName").value = user.last_name || "";
+    } catch (error) {
+      console.error("Error loading profile:", error);
+    }
+  }
+
+  function checkPasswordStrength(password) {
+    const strengthElement = document.getElementById("passwordStrength");
+
+    // Clear existing content
+    while (strengthElement.firstChild) {
+      strengthElement.removeChild(strengthElement.firstChild);
+    }
+
+    let strength = 0;
+
+    if (password.length >= 8) strength++;
+    if (/[a-z]/.test(password)) strength++;
+    if (/[A-Z]/.test(password)) strength++;
+    if (/\d/.test(password)) strength++;
+    if (/[^a-zA-Z\d]/.test(password)) strength++;
+
+    let label, className;
+    if (strength < 2) {
+      label = "🔴 Weak Password";
+      className = "password-strength strength-weak";
+    } else if (strength < 4) {
+      label = "🟡 Fair Password";
+      className = "password-strength strength-fair";
+    } else {
+      label = "🟢 Strong Password";
+      className = "password-strength strength-good";
+    }
+
+    strengthElement.textContent = label;
+    strengthElement.className = className;
+  }
+</script>
+{% endblock %}

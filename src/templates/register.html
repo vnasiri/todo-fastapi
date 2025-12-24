@@ -1,0 +1,508 @@
+{% extends "base.html" %} {% block title %}Register - Todos App{% endblock %} {%
+block meta_description %}Create a new Todos account{% endblock %} {% block
+extra_css %}
+<style>
+  .register-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    position: relative;
+    padding: 2rem 0;
+  }
+
+  .register-container::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(
+        circle at 20% 50%,
+        rgba(255, 255, 255, 0.1) 0%,
+        transparent 50%
+      ),
+      radial-gradient(
+        circle at 80% 80%,
+        rgba(255, 255, 255, 0.05) 0%,
+        transparent 50%
+      );
+    pointer-events: none;
+  }
+
+  .register-card {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: var(--border-radius);
+    box-shadow: var(--card-shadow);
+    width: 100%;
+    max-width: 480px;
+    padding: 2.5rem;
+    position: relative;
+    z-index: 1;
+    animation: slideInUp 0.6s ease-out;
+  }
+
+  @keyframes slideInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .register-header {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+
+  .register-header .logo {
+    font-size: 2.5rem;
+    color: var(--primary-color);
+    margin-bottom: 0.5rem;
+  }
+
+  .register-header h1 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #2d3748;
+    margin-bottom: 0.5rem;
+  }
+
+  .register-header p {
+    color: #718096;
+    font-size: 0.95rem;
+  }
+
+  .form-control {
+    border: 2px solid #e2e8f0;
+    border-radius: var(--border-radius);
+    padding: 0.875rem 1rem;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    background: #f7fafc;
+  }
+
+  .form-control:focus {
+    border-color: var(--primary-color);
+    background: white;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  }
+
+  .form-control.is-invalid {
+    border-color: var(--danger-color);
+    background: rgba(245, 101, 101, 0.05);
+  }
+
+  .form-control.is-invalid:focus {
+    box-shadow: 0 0 0 3px rgba(245, 101, 101, 0.1);
+  }
+
+  .form-label {
+    font-weight: 600;
+    color: #2d3748;
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+  }
+
+  .form-group {
+    margin-bottom: 1.25rem;
+  }
+
+  .btn-register {
+    background: linear-gradient(
+      135deg,
+      var(--primary-color),
+      var(--secondary-color)
+    );
+    border: none;
+    border-radius: var(--border-radius);
+    padding: 0.875rem 1.5rem;
+    font-weight: 600;
+    font-size: 1rem;
+    color: white;
+    width: 100%;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+  }
+
+  .btn-register:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+    color: white;
+  }
+
+  .btn-register:active {
+    transform: translateY(0);
+  }
+
+  .btn-register:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .password-requirements {
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+    padding: 1rem;
+    background: #f7fafc;
+    border-radius: 0.5rem;
+    border-left: 3px solid #cbd5e0;
+  }
+
+  .requirement {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.5rem;
+    color: #718096;
+  }
+
+  .requirement i {
+    width: 20px;
+    margin-right: 0.5rem;
+    color: #cbd5e0;
+  }
+
+  .requirement.met {
+    color: var(--success-color);
+  }
+
+  .requirement.met i {
+    color: var(--success-color);
+  }
+
+  .auth-link {
+    text-align: center;
+    margin-top: 1.5rem;
+    color: #718096;
+    font-size: 0.95rem;
+  }
+
+  .auth-link a {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 600;
+  }
+
+  .auth-link a:hover {
+    text-decoration: underline;
+  }
+
+  .alert {
+    border-radius: var(--border-radius);
+    border: none;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    animation: slideInDown 0.3s ease-out;
+  }
+
+  @keyframes slideInDown {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .alert-danger {
+    background: #fef2f2;
+    border-left: 4px solid var(--danger-color);
+    color: #742a2a;
+  }
+
+  .alert-success {
+    background: #f0fdf4;
+    border-left: 4px solid var(--success-color);
+    color: #15803d;
+  }
+</style>
+{% endblock %} {% block content %}
+<div class="register-container">
+  <div class="register-card">
+    <div class="register-header">
+      <div class="logo">
+        <i class="bi bi-check2-square"></i>
+      </div>
+      <h1>Create Account</h1>
+      <p>Join us and manage your tasks efficiently</p>
+    </div>
+
+    <div id="errorAlert"></div>
+    <div id="successAlert"></div>
+
+    <form id="registerForm">
+      <div class="form-group">
+        <label for="username" class="form-label">
+          <i class="bi bi-person"></i> Username
+        </label>
+        <input
+          type="text"
+          class="form-control"
+          id="username"
+          name="username"
+          placeholder="Choose a username"
+          required
+          minlength="3"
+          maxlength="100"
+          autocomplete="username"
+        />
+        <small class="text-muted d-block mt-1"
+          >3-20 characters, alphanumeric and underscore only</small
+        >
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="firstName" class="form-label">
+            <i class="bi bi-person-fill"></i> First Name
+          </label>
+          <input
+            type="text"
+            class="form-control"
+            id="firstName"
+            name="firstName"
+            placeholder="Enter your first name"
+            required
+            maxlength="100"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="lastName" class="form-label">
+            <i class="bi bi-person-fill"></i> Last Name
+          </label>
+          <input
+            type="text"
+            class="form-control"
+            id="lastName"
+            name="lastName"
+            placeholder="Enter your last name"
+            required
+            maxlength="100"
+          />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="email" class="form-label">
+          <i class="bi bi-envelope"></i> Email
+        </label>
+        <input
+          type="email"
+          class="form-control"
+          id="email"
+          name="email"
+          placeholder="Enter your email"
+          required
+          autocomplete="email"
+        />
+        <small class="text-muted d-block mt-1"
+          >We'll send you a verification link</small
+        >
+      </div>
+
+      <div class="form-group">
+        <label for="password" class="form-label">
+          <i class="bi bi-lock"></i> Password
+        </label>
+        <input
+          type="password"
+          class="form-control"
+          id="password"
+          name="password"
+          placeholder="Enter a strong password"
+          required
+          minlength="8"
+          autocomplete="new-password"
+        />
+        <div class="password-requirements">
+          <div class="requirement" id="req-length">
+            <i class="bi bi-dash-circle"></i>
+            <span>At least 8 characters</span>
+          </div>
+          <div class="requirement" id="req-uppercase">
+            <i class="bi bi-dash-circle"></i>
+            <span>One uppercase letter</span>
+          </div>
+          <div class="requirement" id="req-lowercase">
+            <i class="bi bi-dash-circle"></i>
+            <span>One lowercase letter</span>
+          </div>
+          <div class="requirement" id="req-number">
+            <i class="bi bi-dash-circle"></i>
+            <span>One number</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="password_confirm" class="form-label">
+          <i class="bi bi-lock-check"></i> Confirm Password
+        </label>
+        <input
+          type="password"
+          class="form-control"
+          id="password_confirm"
+          name="password_confirm"
+          placeholder="Confirm your password"
+          required
+          autocomplete="new-password"
+        />
+      </div>
+
+      <div class="form-check mb-3">
+        <input
+          class="form-check-input"
+          type="checkbox"
+          id="agreeTerms"
+          name="agreeTerms"
+          required
+        />
+        <label class="form-check-label" for="agreeTerms">
+          I agree to the
+          <a href="#" class="text-decoration-none">Terms of Service</a> and
+          <a href="#" class="text-decoration-none">Privacy Policy</a>
+        </label>
+      </div>
+
+      <button type="submit" class="btn btn-register" id="registerBtn">
+        <i class="bi bi-person-plus"></i> Create Account
+      </button>
+    </form>
+
+    <div class="auth-link">
+      Already have an account? <a href="/login">Sign in here</a>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block extra_js %}
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const registerForm = document.getElementById("registerForm");
+    const registerBtn = document.getElementById("registerBtn");
+    const passwordInput = document.getElementById("password");
+    const errorAlert = document.getElementById("errorAlert");
+    const successAlert = document.getElementById("successAlert");
+
+    // Password requirements checker
+    passwordInput.addEventListener("input", function () {
+      const password = this.value;
+
+      updateRequirement("req-length", password.length >= 8);
+      updateRequirement("req-uppercase", /[A-Z]/.test(password));
+      updateRequirement("req-lowercase", /[a-z]/.test(password));
+      updateRequirement("req-number", /\d/.test(password));
+    });
+
+    function updateRequirement(id, met) {
+      const element = document.getElementById(id);
+      if (met) {
+        element.classList.add("met");
+        element.querySelector("i").className = "bi bi-check-circle";
+      } else {
+        element.classList.remove("met");
+        element.querySelector("i").className = "bi bi-dash-circle";
+      }
+    }
+
+    function createAlert(message, type) {
+      const alertDiv = document.createElement("div");
+      alertDiv.className = `alert alert-${type}`;
+      alertDiv.setAttribute("role", "alert");
+
+      const icon = document.createElement("i");
+      icon.className =
+        type === "danger" ? "bi bi-exclamation-circle" : "bi bi-check-circle";
+
+      const strong = document.createElement("strong");
+      strong.textContent = type === "danger" ? "Error:" : "Success!";
+
+      const messageText = document.createTextNode(" " + message);
+
+      alertDiv.appendChild(icon);
+      alertDiv.appendChild(document.createTextNode(" "));
+      alertDiv.appendChild(strong);
+      alertDiv.appendChild(messageText);
+
+      return alertDiv;
+    }
+
+    // Form submission
+    registerForm.addEventListener("submit", async function (e) {
+      e.preventDefault();
+
+      const username = document.getElementById("username").value.trim();
+      const firstName = document.getElementById("firstName").value.trim();
+      const lastName = document.getElementById("lastName").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
+      const password_confirm =
+        document.getElementById("password_confirm").value;
+
+      // Clear alerts
+      while (errorAlert.firstChild) {
+        errorAlert.removeChild(errorAlert.firstChild);
+      }
+      while (successAlert.firstChild) {
+        successAlert.removeChild(successAlert.firstChild);
+      }
+
+      // Validate required fields
+      if (!firstName || !lastName) {
+        errorAlert.appendChild(
+          createAlert("First and last name are required", "danger")
+        );
+        return;
+      }
+
+      // Validate passwords match
+      if (password !== password_confirm) {
+        errorAlert.appendChild(createAlert("Passwords do not match", "danger"));
+        return;
+      }
+
+      registerBtn.disabled = true;
+      registerBtn.classList.add("loading");
+
+      try {
+        const result = await auth.register(
+          username,
+          email,
+          password,
+          firstName,
+          lastName
+        );
+        if (result.success) {
+          successAlert.appendChild(
+            createAlert(
+              "Please check your email to verify your account.",
+              "success"
+            )
+          );
+          registerForm.reset();
+          setTimeout(() => {
+            window.location.href = "/login";
+          }, 3000);
+        }
+      } catch (error) {
+        errorAlert.appendChild(
+          createAlert(error.message || "Registration failed", "danger")
+        );
+        registerBtn.disabled = false;
+        registerBtn.classList.remove("loading");
+      }
+    });
+  });
+</script>
+{% endblock %}
